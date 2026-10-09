@@ -1,48 +1,50 @@
 import express from "express";
-// import  cros from "cors";
+import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes/sellerRoutes.js";
 import productRouter from "./routes/productRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
-import { fileURLToPath } from "url";
 import newsletterRoutes from "./routes/newsletterRoutes.js";
+import { fileURLToPath } from "url";
 import path from "path";
+import fs from "fs";
+
 dotenv.config();
 
 const app = express();
-// app.use(cors());
+
+// 1. CORS enable karein taake frontend live API hit kar sake
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
+// 2. Base test route
 app.get("/", (req, res) => {
-   res.json({
-    message: "Cartivo API is running"
-  })
-})
+  res.json({
+    message: "Cartivo API is running successfully!",
+  });
+});
 
+console.log("Cartivo API is running successfully!");
+// 3. Vercel Safe Static Uploads Handling
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+const uploadsPath = path.join(__dirname, "../uploads");
 
+// Sirf tab static serve karein agar uploads folder real mein exist karta ho (Local Dev)
+if (fs.existsSync(uploadsPath)) {
+  app.use("/uploads", express.static(uploadsPath));
+}
 
-
+// 4. API Routes
 app.use("/api/v2/seller", router);
-
 app.use("/api/v2/product", productRouter);
-
-// Route declaration
 app.use("/api/v2/event", eventRoutes);
-
-
 app.use("/api/v2/newsletter", newsletterRoutes);
-
-
-
-// /api/v2/product/get-all-products
-
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}`);
-// })
 
 export default app;

@@ -47,4 +47,10 @@ app.use("/api/v2/product", productRouter);
 app.use("/api/v2/event", eventRoutes);
 app.use("/api/v2/newsletter", newsletterRoutes);
 
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
 export default app;
